@@ -2,9 +2,11 @@ package servicio;
 
 import modelo.Libro;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InventarioLibreria {
     private List<Libro> catalogo = new ArrayList<>();
@@ -47,17 +49,24 @@ public class InventarioLibreria {
     }
 
     public boolean agregarLibro(Libro libro) {
-        for (Libro l : catalogo) {
-            if (l.getIsbn().equalsIgnoreCase(libro.getIsbn())) {
-                return false;
-            }
+        if (buscarPorIsbn(libro.getIsbn()).isPresent()) {
+            return false;
         }
         catalogo.add(libro);
         return true;
     }
 
+    public Optional<Libro> buscarPorIsbn(String isbn) {
+        for (Libro l : catalogo) {
+            if (l.getIsbn().equalsIgnoreCase(isbn)) {
+                return Optional.of(l);
+            }
+        }
+        return Optional.empty();
+    }
+
     public List<Libro> getCatalogo() {
-        return catalogo;
+        return Collections.unmodifiableList(catalogo);
     }
 
     public List<Libro> buscarMulticriterio(String categoria, Integer anio, String idioma) {
@@ -86,7 +95,7 @@ public class InventarioLibreria {
         int totalLibros = catalogo.size();
         int totalUnidades = 0;
         double valorTotalInventario = 0;
-        Map<String, Integer> conteoPorCategoria = new HashMap<>();
+        Map<String, Integer> conteoPorCategoria = new LinkedHashMap<>();
 
         for (Libro l : catalogo) {
             totalUnidades += l.getStock();

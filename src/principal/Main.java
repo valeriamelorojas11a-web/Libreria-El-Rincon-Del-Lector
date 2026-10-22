@@ -4,6 +4,7 @@ import modelo.Libro;
 import servicio.InventarioLibreria;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -63,8 +64,8 @@ public class Main {
         String categoria = leerTexto(scanner, "Categoría (ej. Terror): ");
         int anio = leerEntero(scanner, "Año de publicación (ej. 2000): ");
         String idioma = leerTexto(scanner, "Idioma (ej. Espanol): ");
-        double precio = leerDouble(scanner, "Precio ($): ");
-        int stock = leerEntero(scanner, "Stock inicial: ");
+        double precio = leerDoubleNoNegativo(scanner, "Precio ($): ");
+        int stock = leerEnteroNoNegativo(scanner, "Stock inicial: ");
 
         Libro nuevoLibro = new Libro(isbn, titulo, autor, categoria, anio, idioma, precio, stock);
         if (inventario.agregarLibro(nuevoLibro)) {
@@ -101,17 +102,12 @@ public class Main {
         System.out.println("\n--- ACTUALIZAR STOCK DE UN LIBRO ---");
         String isbn = leerTexto(scanner, "Ingrese el ISBN del libro a actualizar: ");
 
-        Libro libroEncontrado = null;
-        for (Libro l : inventario.getCatalogo()) {
-            if (l.getIsbn().equalsIgnoreCase(isbn)) {
-                libroEncontrado = l;
-                break;
-            }
-        }
+        Optional<Libro> encontrado = inventario.buscarPorIsbn(isbn);
 
-        if (libroEncontrado != null) {
+        if (encontrado.isPresent()) {
+            Libro libroEncontrado = encontrado.get();
             System.out.println("Libro encontrado: " + libroEncontrado.getTitulo() + " (Stock actual: " + libroEncontrado.getStock() + ")");
-            int nuevoStock = leerEntero(scanner, "Ingrese el nuevo stock: ");
+            int nuevoStock = leerEnteroNoNegativo(scanner, "Ingrese el nuevo stock: ");
             libroEncontrado.setStock(nuevoStock);
             System.out.println("✅ Stock actualizado correctamente.");
         } else {
@@ -155,6 +151,26 @@ public class Main {
             } catch (NumberFormatException e) {
                 System.out.println("❌ Error: Debe ingresar un número entero válido.");
             }
+        }
+    }
+
+    private static int leerEnteroNoNegativo(Scanner scanner, String mensaje) {
+        while (true) {
+            int valor = leerEntero(scanner, mensaje);
+            if (valor >= 0) {
+                return valor;
+            }
+            System.out.println("❌ Error: El valor no puede ser negativo.");
+        }
+    }
+
+    private static double leerDoubleNoNegativo(Scanner scanner, String mensaje) {
+        while (true) {
+            double valor = leerDouble(scanner, mensaje);
+            if (valor >= 0) {
+                return valor;
+            }
+            System.out.println("❌ Error: El valor no puede ser negativo.");
         }
     }
 
