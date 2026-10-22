@@ -11,6 +11,15 @@ public class Libro {
     private int stock;
 
     public Libro(String isbn, String titulo, String autor, String categoria, int anio, String idioma, double precio, int stock) {
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo.");
+        }
+        if (stock < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo.");
+        }
         this.isbn = isbn;
         this.titulo = titulo;
         this.autor = autor;
@@ -31,9 +40,10 @@ public class Libro {
     public int getStock() { return stock; }
 
     public void setStock(int stock) {
-        if (stock >= 0) {
-            this.stock = stock;
+        if (stock < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo.");
         }
+        this.stock = stock;
     }
 
     @Override
